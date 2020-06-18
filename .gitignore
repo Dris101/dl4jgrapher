@@ -1,0 +1,10 @@
+# IDE
+.bloop
+.metals
+metals.sbt
+
+# Build
+target/
+
+*.scala.ignore
+*.dot

@@ -111,9 +111,11 @@ class DotGraphListener(net: ComputationGraph, inputTypes: Seq[InputType]) extend
               VertexNode(node, None, None, activations(node).shape().toList, None, None, "none", "cornsilk", bgcolor)
           }
         }
-        .getOrElse(
-          VertexNode(node, None, None, activations(node).shape().toList, None, None, "none", "cornsilk", bgcolor)
-        )
+        .getOrElse({
+          // If there is no activation in the map, show empty placeholder
+          val shape = activations.get(node).map { _.shape().toList }.getOrElse(List())
+          VertexNode(node, None, None, shape, None, None, "none", "cornsilk", bgcolor)
+        })
 
       nb.append(
         raw""""${description.name}" [shape=${description.nodeShape}, margin=0, label=<<table border="0" cellspacing = "0" cellborder="1">"""
@@ -177,7 +179,17 @@ class DotGraphListener(net: ComputationGraph, inputTypes: Seq[InputType]) extend
     Files.writeString(path, toDot())
   }
 
-  override def onForwardPass(m: Model, juActivations: ju.Map[String, INDArray]) = {
+  override def onForwardPass(model: Model, juActivations: ju.List[INDArray]) = {
+
+    // Called by MultiLayerNetwork
+    activations = juActivations.asScala.zipWithIndex.map {
+      case (a, i) => (i.toString, a)
+    }.toMap
+  }
+
+  override def onForwardPass(model: Model, juActivations: ju.Map[String, INDArray]) = {
+
+    // Called by ComputationGraph
     activations = juActivations.asScala.toMap // Cast to immutable
   }
 }

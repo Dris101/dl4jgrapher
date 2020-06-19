@@ -28,4 +28,4 @@ grapher.writeDotFile(java.nio.file.Paths.get("alexnet.dot"))
 ```
 
 # Example Output
-![Image of network graph](./alexnet.pdf)
+![AlexNet](./alexnet.pdf)

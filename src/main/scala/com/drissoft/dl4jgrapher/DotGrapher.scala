@@ -95,7 +95,7 @@ class DotGrapher(conf: ComputationGraphConfiguration, activations: Map[String, I
                 _lossFunctionClass.getOption(json).map { _.split('.').last },
                 Option(preProc),
                 "none",
-                if (isOutput) "darkgrey" else "cornsilk",
+                if (isOutput) "black" else "cornsilk",
                 bgcolor
               )
 

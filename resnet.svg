@@ -2913,7 +2913,7 @@
 <text text-anchor="start" x="46.5" y="-163.3" font-family="Times New Roman,serif" font-size="14.00">CNN to FF (1 x 1, 2048 chans, NCHW)</text>
 <polygon fill="Yellow" stroke="transparent" points="43.5,-135.5 43.5,-156.5 275.5,-156.5 275.5,-135.5 43.5,-135.5"/>
 <polygon fill="none" stroke="black" points="43.5,-135.5 43.5,-156.5 275.5,-156.5 275.5,-135.5 43.5,-135.5"/>
-<text text-anchor="start" x="141" y="-142.3" font-family="Times New Roman,serif" font-size="14.00" fill="darkgrey">output</text>
+<text text-anchor="start" x="141" y="-142.3" font-family="Times New Roman,serif" font-size="14.00">output</text>
 <polygon fill="none" stroke="black" points="43.5,-114.5 43.5,-135.5 275.5,-135.5 275.5,-114.5 43.5,-114.5"/>
 <text text-anchor="start" x="124" y="-121.3" font-family="Times New Roman,serif" font-size="14.00">OutputLayer</text>
 <polygon fill="none" stroke="black" points="43.5,-93.5 43.5,-114.5 275.5,-114.5 275.5,-93.5 43.5,-93.5"/>

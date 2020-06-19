@@ -14,7 +14,7 @@
 <title>12</title>
 <polygon fill="Yellow" stroke="transparent" points="58.09,-136 58.09,-157 169.09,-157 169.09,-136 58.09,-136"/>
 <polygon fill="none" stroke="black" points="58.09,-136 58.09,-157 169.09,-157 169.09,-136 58.09,-136"/>
-<text text-anchor="start" x="89.09" y="-142.8" font-family="Times New Roman,serif" font-size="14.00" fill="darkgrey">Layer 12</text>
+<text text-anchor="start" x="89.09" y="-142.8" font-family="Times New Roman,serif" font-size="14.00">Layer 12</text>
 <polygon fill="none" stroke="black" points="58.09,-115 58.09,-136 169.09,-136 169.09,-115 58.09,-115"/>
 <text text-anchor="start" x="78.09" y="-121.8" font-family="Times New Roman,serif" font-size="14.00">OutputLayer</text>
 <polygon fill="none" stroke="black" points="58.09,-94 58.09,-115 169.09,-115 169.09,-94 58.09,-94"/>

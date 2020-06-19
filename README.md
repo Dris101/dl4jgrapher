@@ -3,8 +3,13 @@ Classes to generate Graphviz DOT files from DL4J MultiLayerNetworks and Computat
 
 For prototyping for example, with VS Code as your IDE, you can use João Pinto's excellent Graphviz (dot) language support extension (https://github.com/joaompinto/vscode-graphviz) to preview the generated DOT file alongside the dl4j code. You can also use Graphviz tools (https://graphviz.org/) to generate files in formats such as pdf, png, svg etc. from the DOT file for display / publication purposes.
 
-```powershell
-C:\Graphviz\bin\dot.exe -Tsvg alexnet.dot -o alexnet.svg
+# Installation
+
+## SBT
+In build.sbt:
+
+```scala
+libraryDependencies += "com.drissoft" %% "dl4jgrapher" % "0.1.0"
 ```
 
 # Scala Examples
@@ -34,6 +39,12 @@ val grapher = new MultiLayerNetworkGrapher(net).getGrapher(input, inputType)
 
 // Output the DOT file
 grapher.writeDotFile(java.nio.file.Paths.get("alexnet.dot"))
+```
+
+### Graphviz
+
+```powershell
+<Graphviz Dir>\bin\dot.exe -Tsvg alexnet.dot -o alexnet.svg
 ```
 
 ### Output

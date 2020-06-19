@@ -1,7 +1,7 @@
-package com.drissoft.dl4jgrapher.listeners
+package com.drissoft.dl4jgrapher
 
-import java.{util => ju}
 import java.nio.file._
+import scala.util._
 import scala.collection.JavaConverters._
 import io.circe._
 import io.circe.parser._
@@ -11,15 +11,14 @@ import org.deeplearning4j.nn.conf.inputs.InputType._
 import org.deeplearning4j.nn.conf.preprocessor._
 import org.deeplearning4j.nn.conf.graph._
 import org.nd4j.linalg.api.ndarray.INDArray
-import org.deeplearning4j.optimize.api.BaseTrainingListener
-import org.deeplearning4j.nn.graph.ComputationGraph
-import org.deeplearning4j.nn.api.Model
 import org.deeplearning4j.nn.conf.InputPreProcessor
+import org.deeplearning4j.nn.conf.ComputationGraphConfiguration
 
-class DotGraphListener(net: ComputationGraph, inputTypes: Seq[InputType]) extends BaseTrainingListener {
+class DotGrapher(conf: ComputationGraphConfiguration, activations: Map[String, INDArray], inputTypes: Seq[InputType]) {
 
   private case class VertexNode(
-      name: String,
+      id: String,
+      label: String,
       nodeType: Option[String],
       activationType: Option[String],
       activationShape: List[Long],
@@ -30,14 +29,19 @@ class DotGraphListener(net: ComputationGraph, inputTypes: Seq[InputType]) extend
       backgroundColor: String
   )
 
-  private val conf         = net.getConfiguration()
   private val inputs       = conf.getNetworkInputs().asScala.toSet
   private val outputs      = conf.getNetworkOutputs().asScala.toSet
   private val vertexInputs = conf.getVertexInputs().asScala map { case (k, v) => k -> v.asScala }
   private val verticies    = conf.getVertices().asScala
   private val actTypes     = conf.getLayerActivationTypes(inputTypes: _*).asScala
 
-  private var activations = Map.empty[String, INDArray]
+  override def toString() = {
+    s"""Inputs: ${inputs.mkString(",")}
+         |Outputs: ${outputs.mkString(",")}
+         |
+         |Activation shapes:-
+         |${activations.map { case (k, v) => (k -> v.shape().mkString(",")) }.mkString("\n")}""".stripMargin
+  }
 
   private def vertexOutputs = {
     vertexInputs.toList flatMap {
@@ -56,7 +60,6 @@ class DotGraphListener(net: ComputationGraph, inputTypes: Seq[InputType]) extend
     val _layerClass        = root.layer.`@class`.string
     val _activationClass   = root.layer.activationFn.`@class`.string
     val _lossFunctionClass = root.layer.lossFn.`@class`.string
-    val _layerOuts         = root.layer.nout.long
 
     def makeNode(node: String) = {
       val nb       = new StringBuilder()
@@ -73,20 +76,22 @@ class DotGraphListener(net: ComputationGraph, inputTypes: Seq[InputType]) extend
       val description: VertexNode = verticies
         .get(node)
         .map { v =>
+          // Prettier layer names for layers with numbers
+          val label = Try(node.toInt) match {
+            case Success(l) => s"Layer $l"
+            case _          => node
+          }
+
           v match {
             case l: LayerVertex =>
               val json: Json = parse(l.getLayerConf().toJson()).getOrElse(Json.Null)
-              //println("LayerJson = " + json)
-
-              val preProc = l.getPreProcessor()
+              val preProc    = l.getPreProcessor()
               VertexNode(
                 node,
+                label,
                 _layerClass.getOption(json).map { _.split('.').last },
                 _activationClass.getOption(json).map { _.split('.').last },
-                if (isOutput) {
-                  List(_layerOuts.getOption(json).get)
-                } else
-                  activations(node).shape().toList,
+                activations(node).shape().toList,
                 _lossFunctionClass.getOption(json).map { _.split('.').last },
                 Option(preProc),
                 "none",
@@ -97,6 +102,7 @@ class DotGraphListener(net: ComputationGraph, inputTypes: Seq[InputType]) extend
             case g: GraphVertex =>
               VertexNode(
                 node,
+                label,
                 Some(g.getClass().getName().split('.').last),
                 None,
                 activations(node).shape().toList,
@@ -108,17 +114,28 @@ class DotGraphListener(net: ComputationGraph, inputTypes: Seq[InputType]) extend
               )
 
             case _ =>
-              VertexNode(node, None, None, activations(node).shape().toList, None, None, "none", "cornsilk", bgcolor)
+              VertexNode(
+                node,
+                label,
+                None,
+                None,
+                activations(node).shape().toList,
+                None,
+                None,
+                "none",
+                "cornsilk",
+                bgcolor
+              )
           }
         }
         .getOrElse({
           // If there is no activation in the map, show empty placeholder
           val shape = activations.get(node).map { _.shape().toList }.getOrElse(List())
-          VertexNode(node, None, None, shape, None, None, "none", "cornsilk", bgcolor)
+          VertexNode(node, node, None, None, shape, None, None, "none", "cornsilk", bgcolor)
         })
 
       nb.append(
-        raw""""${description.name}" [shape=${description.nodeShape}, margin=0, label=<<table border="0" cellspacing = "0" cellborder="1">"""
+        raw""""${description.id}" [shape=${description.nodeShape}, margin=0, label=<<table border="0" cellspacing = "0" cellborder="1">"""
       )
 
       description.preProcessor foreach { p =>
@@ -138,7 +155,7 @@ class DotGraphListener(net: ComputationGraph, inputTypes: Seq[InputType]) extend
         nb.append(s"""<tr><td bgcolor="darkolivegreen1">$pText</td></tr>\n""")
       }
       nb.append(
-        raw"""<tr><td bgcolor="${description.backgroundColor}"><font color="${description.color}">${description.name}</font></td></tr>"""
+        raw"""<tr><td bgcolor="${description.backgroundColor}"><font color="${description.color}">${description.label}</font></td></tr>"""
       )
 
       description.nodeType foreach { t => nb.append(s"<tr><td>$t</td></tr>\n") }
@@ -175,21 +192,7 @@ class DotGraphListener(net: ComputationGraph, inputTypes: Seq[InputType]) extend
     sb.result()
   }
 
-  def toDotFile(path: Path) = {
+  def writeDotFile(path: Path) = {
     Files.writeString(path, toDot())
-  }
-
-  override def onForwardPass(model: Model, juActivations: ju.List[INDArray]) = {
-
-    // Called by MultiLayerNetwork
-    activations = juActivations.asScala.zipWithIndex.map {
-      case (a, i) => (i.toString, a)
-    }.toMap
-  }
-
-  override def onForwardPass(model: Model, juActivations: ju.Map[String, INDArray]) = {
-
-    // Called by ComputationGraph
-    activations = juActivations.asScala.toMap // Cast to immutable
   }
 }

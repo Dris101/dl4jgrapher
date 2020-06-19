@@ -1,5 +1,5 @@
 ThisBuild / organization := "com.drissoft"
-ThisBuild / maintainer := "me@drissoft.com"
+ThisBuild / maintainer := "dris@drissoft.com"
 ThisBuild / version := "0.1.0-SNAPSHOT"
 ThisBuild / scalaVersion := "2.12.11"
 ThisBuild / crossScalaVersions := Seq("2.12.11", "2.13.1")

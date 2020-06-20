@@ -2,7 +2,7 @@ ThisBuild / organization := "com.drissoft"
 ThisBuild / organizationName := "drissoft"
 ThisBuild / maintainer := "dris@drissoft.com"
 ThisBuild / homepage := Some(url("https://github.com/Dris101/dl4jgrapher"))
-ThisBuild / version := "0.1.0"
+ThisBuild / version := "0.2.0-SNAPSHOT"
 
 ThisBuild / developers := List(
   Developer(

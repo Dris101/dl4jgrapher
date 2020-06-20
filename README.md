@@ -14,9 +14,15 @@ libraryDependencies += "com.drissoft" %% "dl4jgrapher" % "0.1.0"
 
 # Scala Examples
 
+[AlexNet](#AlexNet-Output)
+
+[ResNet50](#ResNet50-Output)
+
+[InceptionResNetV1](#InceptionResNetV1-Output)
+
 ## MultiLayerNetwork
 
-### Code
+### AlexNet
 
 ```scala
 import org.deeplearning4j.zoo.model.AlexNet
@@ -47,12 +53,12 @@ grapher.writeDotFile(java.nio.file.Paths.get("alexnet.dot"))
 <Graphviz Dir>\bin\dot.exe -Tsvg alexnet.dot -o alexnet.svg
 ```
 
-### Output
+### AlexNet Output
 ![AlexNet](./alexnet.svg)
 
 ## ComputationGraph
 
-### Code
+### ResNet50
 
 ```scala
 import org.deeplearning4j.zoo.model.ResNet50
@@ -77,5 +83,8 @@ val grapher = new ComputationGraphGrapher(net).getGrapher(Array(input), inputTyp
 grapher.writeDotFile(java.nio.file.Paths.get("resnet.dot"))
 ```
 
-### Output
+### ResNet50 Output
 ![ResNet50](./resnet.svg)
+
+### InceptionResNetV1 Output
+![InceptionResNetV1](./inception.svg)

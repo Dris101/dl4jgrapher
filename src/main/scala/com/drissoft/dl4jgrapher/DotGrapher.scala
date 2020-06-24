@@ -148,6 +148,11 @@ class DotGrapher(conf: ComputationGraphConfiguration, activations: Map[String, I
           case ffRnn: FeedForwardToRnnPreProcessor => s"FF to RNN (${ffRnn.getRnnDataFormat()})"
           case rnnFf: RnnToFeedForwardPreProcessor => s"RNN to FF (${rnnFf.getRnnDataFormat()})"
 
+          case cnnRnn: CnnToRnnPreProcessor =>
+            val c = cnnRnn.getNumChannels()
+            s"CNN to RNN (${cnnRnn.getInputHeight()} x ${cnnRnn.getInputWidth()}, $c chan${if (c > 1) "s"
+            else ""}, ${cnnRnn.getRnnDataFormat()})"
+
           case cnnFf: CnnToFeedForwardPreProcessor =>
             val c = cnnFf.getNumChannels()
             s"CNN to FF (${cnnFf.getInputHeight()} x ${cnnFf.getInputWidth()}, $c chan${if (c > 1) "s" else ""}, ${cnnFf.getFormat})"
